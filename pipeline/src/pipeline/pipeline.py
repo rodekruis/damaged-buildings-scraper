@@ -8,6 +8,7 @@ import pandas as pd
 from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
 import logging
+from io import StringIO
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -172,7 +173,9 @@ def main():
                 c.perform()
                 c.close()
                 body = buffer.getvalue()
-                df1 = pd.read_json(body.decode('utf-8'))
+
+                df1 = pd.read_json(StringIO(body.decode('utf-8')))
+                
                 df = df.append(df1)
 
             df.to_csv(os.path.join(data_dir, 'output_province_%d.csv' % ilId), encoding='utf-8')

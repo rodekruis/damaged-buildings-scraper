@@ -3,6 +3,7 @@
 import pycurl
 from io import BytesIO
 import pandas as pd
+from io import StringIO
 
 neighborhoods = pd.read_csv('neighborhoods.csv')  
 neighborhoods['province_id'] = pd.to_numeric(neighborhoods['province_id'])
@@ -20,23 +21,17 @@ mahalleId = mahalleIds[0]
 token = 'CfDJ8DiwZ9kiuR5MhDkMn4nG-LB5vipGJefL-Th-cXB2biBhZosYdLTrQmHyJN05S8D4r323qV_4y9GT7XjqSLoK2kYw-x2N9xUIlPSjJVR7UiWMvEboxV3rvZ-bwlwP7kIYBuIq1V3EZX5pNbVfLoFl9uU'
 
 request = url % (ilId, ilceId, mahalleId, token)
-#print(request)
 
-# Creating a buffer as the cURL is not allocating a buffer for the network response
 buffer = BytesIO()
 c = pycurl.Curl()
-#initializing the request URL
 c.setopt(c.URL, request)
-#setting options for cURL transfer  
 c.setopt(c.WRITEDATA, buffer)
-# perform file transfer
 c.perform()
-#Ending the session and freeing the resources
 c.close()
 
 body = buffer.getvalue()
 
-df = pd.read_json(body.decode('utf-8'))
+df = pd.read_json(StringIO(body.decode('utf-8')))
 
 numberOfIds = len(mahalleIds)
 for i in range(1,numberOfIds):
@@ -52,7 +47,11 @@ for i in range(1,numberOfIds):
     c.perform()
     c.close()
     body = buffer.getvalue()
-    df1 = pd.read_json(body.decode('utf-8'))
-    df = df.append(df1)
+    df1 = pd.read_json(StringIO(body.decode('utf-8')))
+    if i % 200 == 0:
+        df.to_csv('output_province_%d_%d.csv' % (ilId, i),encoding='utf-8')
+        df = df1
+    else:
+        df = df.append(df1)
 
 df.to_csv('output_province_%d.csv' % ilId,encoding='utf-8')

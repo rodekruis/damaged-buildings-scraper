@@ -7,3 +7,4 @@ pandas==1.2.4
 python-dotenv==0.21.1
 requests==2.28.2
 pycurl==7.45.2
+fsspec==2023.1.0

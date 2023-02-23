@@ -4,7 +4,7 @@ import pycurl
 from io import BytesIO
 import pandas as pd
 
-provinces = pd.read_csv('provinces.csv')  
+provinces = pd.read_csv('data/provinces.csv')  
 ilIds = provinces['id']
 url = "https://hasartespit.csb.gov.tr/query/counties?cityId=%d"
 ilId = ilIds[0]
